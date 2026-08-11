@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Shopping Mall | 3D Luxury Multi-Floor Experience</title>
+  <meta name="description" content="Experience a realistic 5-floor virtual shopping mall with interactive elevators, luxury cosmetics, apparel, toys, books, multi-gateway checkout, live tracking, and digital invoices.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Viewport Control Mode Bar -->
+  <div class="viewport-control-bar">
+    <div class="viewport-title">
+      <span>🏢 Virtual Mall Simulator</span>
+    </div>
+    <button class="view-toggle-btn" id="view-mode-toggle-btn" onclick="window.App.toggleDeviceViewMode()">
+      🖥️ Switch to Full Screen View
+    </button>
+  </div>
+
+  <!-- Main Mobile App Shell Wrapper -->
+  <div id="mobile-app-shell" class="mobile-phone-frame">
+    
+    <!-- Top Sticky Header -->
+    <header class="app-header">
+      <div class="header-top">
+        <div class="mall-logo" onclick="window.App.switchFloor('GF')">
+          <div class="logo-icon">✨</div>
+          <div class="logo-text">
+            <h1>GRAND MALL</h1>
+            <span>VIRTUAL SHOPPING APP</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="icon-btn" title="Notifications" onclick="window.App.openNotificationsDrawer()">
+            🔔 <span class="badge-count" style="display:inline-block;">2</span>
+          </button>
+
+          <button class="icon-btn" title="Wishlist" onclick="window.Cart.renderCartUI(); document.getElementById('cart-drawer').classList.add('active');">
+            ❤️ <span class="badge-count wish-badge-count" style="display:none;">0</span>
+          </button>
+
+          <button class="icon-btn" title="Shopping Cart" onclick="window.Cart.renderCartUI(); document.getElementById('cart-drawer').classList.add('active');">
+            🛒 <span class="badge-count cart-badge-count" style="display:none;">0</span>
+          </button>
+
+          <button class="icon-btn" title="User Profile" onclick="window.Auth.openProfileModal()">
+            👤
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & Sorting Toolbar -->
+      <div class="search-bar-row">
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="mall-search-input" placeholder="Search across perfumes, sarees, jackets, books...">
+        </div>
+        <select id="sort-select" class="sort-select-box">
+          <option value="featured">Featured</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="rating">Highest Rated</option>
+          <option value="newest">Newest</option>
+        </select>
+      </div>
+    </header>
+
+    <!-- Floor Navigation Elevator Tabs -->
+    <nav class="floor-nav-wrapper" id="floor-navigation-bar">
+      <!-- Dynamically Rendered by App.js -->
+    </nav>
+
+    <!-- 3D Interactive Mall Hero & Elevator View -->
+    <section class="mall-3d-hero-section">
+      <img src="images/mall_banner_3d.jpg" alt="Virtual Mall 3D Atrium" class="hero-banner-image">
+      
+      <div class="hero-overlay-content">
+        <div>
+          <h2 class="floor-banner-title" id="active-floor-title">✨ Ground Floor</h2>
+          <p class="floor-banner-tagline" id="active-floor-tagline">Cosmetics & Luxury Accessories</p>
+        </div>
+
+        <!-- Glass Elevator Lift Controls -->
+        <div class="elevator-shaft-container">
+          <div class="elevator-shaft">
+            <div class="elevator-car" id="elevator-car">
+              <span id="lift-current-floor">GF</span>
+            </div>
+          </div>
+
+          <div class="elevator-btn-group">
+            <button class="elevator-btn" data-floor="4F">4F</button>
+            <button class="elevator-btn" data-floor="3F">3F</button>
+            <button class="elevator-btn" data-floor="2F">2F</button>
+            <button class="elevator-btn" data-floor="1F">1F</button>
+            <button class="elevator-btn active" data-floor="GF">GF</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Canvas 3D Floor Plan Viewport -->
+      <canvas id="mall-3d-canvas" style="display:none;"></canvas>
+    </section>
+
+    <!-- Category Pills Filter Bar -->
+    <div class="category-pills-bar" id="category-pills-bar">
+      <!-- Dynamically Rendered -->
+    </div>
+
+    <!-- Main Products Listing Grid -->
+    <main class="products-section">
+      <div class="section-header-label">
+        <span id="products-count-label">Loading products...</span>
+        <button class="btn btn-xs btn-link" onclick="window.Orders.openOrdersModal()">📦 My Orders & Tracking</button>
+      </div>
+
+      <div class="products-grid" id="products-grid-container">
+        <!-- Dynamically Populated -->
+      </div>
+    </main>
+
+  </div> <!-- End App Shell -->
+
+
+  <!-- Sliding Shopping Cart Drawer -->
+  <aside class="cart-drawer" id="cart-drawer">
+    <div class="drawer-header">
+      <div class="flex items-center gap-2">
+        <h3>🛒 Shopping Cart</h3>
+        <span class="badge badge-gold cart-badge-count" style="display:none;">0</span>
+      </div>
+      <button class="modal-close-btn" onclick="document.getElementById('cart-drawer').classList.remove('active')">✕</button>
+    </div>
+
+    <div class="drawer-body">
+      <div id="cart-items-list">
+        <!-- Cart Items List -->
+      </div>
+      
+      <div id="cart-summary-box" class="cart-summary-wrapper mt-4">
+        <!-- Dynamic Price Summary -->
+      </div>
+    </div>
+  </aside>
+
+
+  <!-- Product Detail Modal -->
+  <div class="modal-overlay" id="product-detail-modal">
+    <div class="modal-content-box">
+      <button class="modal-close-btn" onclick="window.App.closeProductModal()">✕</button>
+      <div id="product-modal-body">
+        <!-- Product Specs & Gallery -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Secure Checkout Modal -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-content-box" style="max-width: 900px;">
+      <button class="modal-close-btn" onclick="window.Checkout.closeCheckoutModal()">✕</button>
+      <h2 class="mb-4">🔒 Secure Multi-Gateway Checkout</h2>
+      <div id="checkout-body-content">
+        <!-- Checkout Address & Payment Form -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Order Success Modal -->
+  <div class="modal-overlay" id="order-success-modal">
+    <!-- Populated by Checkout.js -->
+  </div>
+
+
+  <!-- Order History List Modal -->
+  <div class="modal-overlay" id="orders-modal">
+    <div class="modal-content-box">
+      <button class="modal-close-btn" onclick="window.Orders.closeOrdersModal()">✕</button>
+      <h2 class="mb-4">📦 Order History & Status</h2>
+      <div id="orders-list-body">
+        <!-- Orders Ledger -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Live Order Tracking Modal -->
+  <div class="modal-overlay" id="tracking-modal">
+    <div class="modal-content-box">
+      <button class="modal-close-btn" onclick="window.Orders.closeTrackingModal()">✕</button>
+      <div id="tracking-body-content">
+        <!-- Timeline & Map -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Digital Tax Invoice Modal -->
+  <div class="modal-overlay" id="invoice-modal">
+    <div class="modal-content-box" style="max-width: 800px; background: #cbd5e1;">
+      <button class="modal-close-btn" onclick="window.Invoice.closeInvoiceModal()" style="color: #000;">✕</button>
+      <div id="invoice-modal-body">
+        <!-- Tax Invoice Printable View -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- User Profile Modal -->
+  <div class="modal-overlay" id="profile-modal">
+    <div class="modal-content-box">
+      <button class="modal-close-btn" onclick="window.Auth.closeProfileModal()">✕</button>
+      <div id="profile-modal-body">
+        <!-- Profile & Wallet -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Auth (Login/Signup) Modal -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal-content-box" style="max-width: 400px;">
+      <button class="modal-close-btn" onclick="window.Auth.closeAuthModal()">✕</button>
+      <div class="auth-tabs-row flex gap-2 mb-4">
+        <button class="btn btn-flex flex-1 btn-secondary active" id="tab-login-btn" onclick="window.Auth.switchAuthTab('login')">Log In</button>
+        <button class="btn btn-flex flex-1 btn-secondary" id="tab-signup-btn" onclick="window.Auth.switchAuthTab('signup')">Sign Up</button>
+      </div>
+
+      <form id="auth-login-form" onsubmit="window.Auth.handleLoginSubmit(event)">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" class="form-control" value="aarav.sharma@example.com" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" class="form-control" value="••••••••" required>
+        </div>
+        <button class="btn btn-gold btn-block mt-3" type="submit">Sign In to Account</button>
+      </form>
+
+      <form id="auth-signup-form" style="display:none;" onsubmit="window.Auth.handleSignupSubmit(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" class="form-control" placeholder="Aarav Sharma" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" class="form-control" placeholder="aarav@example.com" required>
+        </div>
+        <div class="form-group">
+          <label>Mobile Number</label>
+          <input type="tel" class="form-control" placeholder="+91 98765 43210" required>
+        </div>
+        <div class="form-group">
+          <label>Create Password</label>
+          <input type="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button class="btn btn-gold btn-block mt-3" type="submit">Create New Account</button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Notifications Drawer -->
+  <aside class="cart-drawer" id="notifications-drawer">
+    <div class="drawer-header">
+      <h3>🔔 Notifications</h3>
+      <button class="modal-close-btn" onclick="window.App.closeNotificationsDrawer()">✕</button>
+    </div>
+    <div class="drawer-body" id="notifications-list-container">
+      <!-- Notifications -->
+    </div>
+  </aside>
+
+
+  <!-- Toast Notification System -->
+  <div id="toast-container"></div>
+
+
+  <!-- JavaScript Application Bundle -->
+  <script src="js/data.js"></script>
+  <script src="js/mall3d.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/checkout.js"></script>
+  <script src="js/orders.js"></script>
+  <script src="js/invoice.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
